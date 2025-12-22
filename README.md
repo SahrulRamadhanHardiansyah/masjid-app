@@ -50,7 +50,7 @@ Ikuti langkah ini untuk menjalankan proyek di komputer Anda.
 
 ### 1. Clone Repository
 ```bash
-git clone [https://github.com/SahrulRamadhanHardiansyah/masjid-app.git](https://github.com/SahrulRamadhanHardiansyah/masjid-app.git)
+git clone https://github.com/SahrulRamadhanHardiansyah/masjid-app
 cd masjid-app
 
 ```
@@ -67,7 +67,7 @@ npm install
 Buat file `.env.local` di root folder dan isi dengan kredensial Supabase Anda:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=[https://your-project-id.supabase.co](https://your-project-id.supabase.co)
+NEXT_PUBLIC_SUPABASE_URL=[https://your-project-id.supabase.co]
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
 ```
@@ -168,5 +168,3 @@ Proyek ini dibuat dan dikelola oleh:
 ## 📝 Lisensi
 
 [MIT License](https://www.google.com/search?q=LICENSE)
-
-```
