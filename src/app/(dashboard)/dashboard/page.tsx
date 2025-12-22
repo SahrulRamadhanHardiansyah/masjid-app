@@ -1,66 +1,180 @@
-import { createClient } from '@/lib/supabase/server'
-import { formatCurrency } from '@/lib/utils'
-import { Wallet, TrendingUp, TrendingDown } from 'lucide-react'
+   import { createClient } from '@/lib/supabase/server'
+   import { formatCurrency } from '@/lib/utils'
+   import { Wallet, ArrowUpRight, ArrowDownRight, TrendingUp, PieChart as PieIcon } from 'lucide-react'
+   import { DashboardFilter } from '@/components/DashboardFilter'
+   import { TrendChart, CategoryPieChart } from '@/components/DashboardCharts'
 
-export default async function DashboardPage() {
-  const supabase = await createClient()
+   export default async function DashboardPage(props: {
+   searchParams: Promise<{ month?: string; year?: string }>
+   }) {
+   const searchParams = await props.searchParams
+   const supabase = await createClient()
 
-  // Logic fetch data
-  const { data: income } = await supabase.from('transactions').select('amount').eq('type', 'income')
-  const { data: expense } = await supabase.from('transactions').select('amount').eq('type', 'expense')
+   // 1. Tentukan Rentang Filter
+   const now = new Date()
+   const month = Number(searchParams.month) || now.getMonth() + 1
+   const year = Number(searchParams.year) || now.getFullYear()
 
-  const totalIncome = income?.reduce((acc, curr) => acc + Number(curr.amount), 0) || 0
-  const totalExpense = expense?.reduce((acc, curr) => acc + Number(curr.amount), 0) || 0
-  const balance = totalIncome - totalExpense
+   const startDate = new Date(year, month - 1, 1).toLocaleDateString('en-CA') 
+   const endDate = new Date(year, month, 0).toLocaleDateString('en-CA')
+   
+   // Nama Bulan untuk UI
+   const monthName = new Date(year, month - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
 
-  return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-800">Ringkasan Masjid</h1>
-        <p className="text-slate-500 mt-1">Pantau kondisi keuangan masjid secara real-time.</p>
+   // 2. Fetch Data (Filtered)
+   const { data: transactions } = await supabase
+      .from('transactions')
+      .select('*, transaction_categories(name)')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: true })
+
+   // 3. Hitung Agregasi Kartu (Card Summary)
+   const incomeTrx = transactions?.filter(t => t.type === 'income') || []
+   const expenseTrx = transactions?.filter(t => t.type === 'expense') || []
+
+   const totalIncome = incomeTrx.reduce((acc, curr) => acc + Number(curr.amount), 0)
+   const totalExpense = expenseTrx.reduce((acc, curr) => acc + Number(curr.amount), 0)
+   const balance = totalIncome - totalExpense
+
+   // 4. Proses Data untuk Grafik Trend (Harian) 
+   // Grouping data by date
+   const chartMap = new Map()
+   transactions?.forEach(t => {
+      const day = new Date(t.date).getDate() // Ambil tanggalnya saja (1-31)
+      if (!chartMap.has(day)) {
+         chartMap.set(day, { date: day.toString(), income: 0, expense: 0 })
+      }
+      const current = chartMap.get(day)
+      if (t.type === 'income') current.income += Number(t.amount)
+      else current.expense += Number(t.amount)
+   })
+   const trendData = Array.from(chartMap.values()).sort((a, b) => Number(a.date) - Number(b.date))
+
+   // 5. Proses Data untuk Grafik Kategori (Distribution) 
+   const catMap = new Map()
+   transactions?.forEach(t => {
+      // Kita gabung Income & Expense atau bisa dipisah. Disini kita visualisasikan SEMUA kategori
+      const catName = t.transaction_categories?.name || 'Lainnya'
+      if (!catMap.has(catName)) {
+         catMap.set(catName, { name: catName, value: 0 })
+      }
+      catMap.get(catName).value += Number(t.amount)
+   })
+   const categoryData = Array.from(catMap.values())
+
+   return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+         
+         {/* Header & Filter */}
+         <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
+         <div>
+            <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Dashboard Analitik</h2>
+            <p className="text-sm text-slate-500 mt-1">
+               Periode laporan: <span className="font-semibold text-blue-600">{monthName}</span>
+            </p>
+         </div>
+         <DashboardFilter />
+         </div>
+         
+         {/* Summary Cards */}
+         <div className="grid gap-4 md:grid-cols-3">
+         {/* Card Saldo */}
+         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+               <Wallet size={64} className="text-blue-600" />
+            </div>
+            <p className="text-sm font-medium text-slate-500 mb-1">Surplus / Defisit (Periode Ini)</p>
+            <h3 className={`text-3xl font-bold tracking-tight ${balance >= 0 ? 'text-blue-700' : 'text-rose-600'}`}>
+               {balance >= 0 ? '+' : ''}{formatCurrency(balance)}
+            </h3>
+            <p className="text-xs text-slate-400 mt-2">Selisih pemasukan dan pengeluaran</p>
+         </div>
+         
+         {/* Card Pemasukan */}
+         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+               <p className="text-sm font-medium text-slate-500 mb-1">Total Pemasukan</p>
+               <h3 className="text-2xl font-bold text-slate-800">{formatCurrency(totalIncome)}</h3>
+               <span className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  <ArrowUpRight size={12} /> {incomeTrx.length} Transaksi
+               </span>
+            </div>
+            <div className="bg-emerald-50 p-3 rounded-full text-emerald-600">
+               <TrendingUp size={24} />
+            </div>
+         </div>
+
+         {/* Card Pengeluaran */}
+         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+               <p className="text-sm font-medium text-slate-500 mb-1">Total Pengeluaran</p>
+               <h3 className="text-2xl font-bold text-slate-800">{formatCurrency(totalExpense)}</h3>
+               <span className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">
+                  <ArrowDownRight size={12} /> {expenseTrx.length} Transaksi
+               </span>
+            </div>
+            <div className="bg-rose-50 p-3 rounded-full text-rose-600">
+               <ArrowDownRight size={24} />
+            </div>
+         </div>
+         </div>
+         
+         {/* Charts Section */}
+         <div className="grid lg:grid-cols-3 gap-6">
+            
+            {/* Grafik Trend */}
+            <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+               <div className="flex items-center gap-2 mb-6">
+                  <div className="bg-blue-50 p-1.5 rounded text-blue-600"><TrendingUp size={18} /></div>
+                  <h3 className="font-bold text-slate-800">Arus Kas Harian</h3>
+               </div>
+               <TrendChart data={trendData} />
+            </div>
+
+            {/* Grafik Kategori */}
+            <div className="lg:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+               <div className="flex items-center gap-2 mb-6">
+                  <div className="bg-purple-50 p-1.5 rounded text-purple-600"><PieIcon size={18} /></div>
+                  <h3 className="font-bold text-slate-800">Distribusi Kategori</h3>
+               </div>
+               <CategoryPieChart data={categoryData} />
+            </div>
+
+         </div>
+
+         {/* Recent Transactions Mini Table */}
+         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+               <h3 className="font-bold text-slate-800 text-sm">Aktivitas Terakhir di Bulan Ini</h3>
+            </div>
+            <div className="overflow-x-auto">
+               <table className="w-full text-left">
+                  <thead className="bg-white text-xs text-slate-500 uppercase">
+                     <tr>
+                        <th className="px-6 py-3 font-medium">Tanggal</th>
+                        <th className="px-6 py-3 font-medium">Kategori</th>
+                        <th className="px-6 py-3 font-medium text-right">Nominal</th>
+                     </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50 text-sm">
+                     {transactions?.slice(0, 5).map(trx => (
+                        <tr key={trx.id} className="hover:bg-slate-50">
+                           <td className="px-6 py-3 text-slate-600">{new Date(trx.date).toLocaleDateString('id-ID')}</td>
+                           <td className="px-6 py-3">{trx.transaction_categories?.name}</td>
+                           <td className={`px-6 py-3 text-right font-medium ${trx.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                              {trx.type === 'income' ? '+' : '-'} {formatCurrency(trx.amount)}
+                           </td>
+                        </tr>
+                     ))}
+                     {transactions?.length === 0 && (
+                        <tr><td colSpan={3} className="px-6 py-8 text-center text-slate-400">Belum ada data</td></tr>
+                     )}
+                  </tbody>
+               </table>
+            </div>
+         </div>
+
       </div>
-      
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Card Saldo - Primary */}
-        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg shadow-emerald-200 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-emerald-100 font-medium text-sm mb-1">Total Saldo Kas</h3>
-            <p className="text-3xl font-bold">{formatCurrency(balance)}</p>
-          </div>
-          <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
-            <Wallet size={120} />
-          </div>
-        </div>
-        
-        {/* Card Pemasukan */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-4">
-             <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-                <TrendingUp size={20} />
-             </div>
-             <span className="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-600 rounded-full">+ Pemasukan</span>
-          </div>
-          <h3 className="text-slate-500 text-sm font-medium">Total Masuk</h3>
-          <p className="text-2xl font-bold text-slate-800 mt-1">{formatCurrency(totalIncome)}</p>
-        </div>
-
-        {/* Card Pengeluaran */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-4">
-             <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
-                <TrendingDown size={20} />
-             </div>
-             <span className="text-xs font-semibold px-2 py-1 bg-red-50 text-red-600 rounded-full">- Pengeluaran</span>
-          </div>
-          <h3 className="text-slate-500 text-sm font-medium">Total Keluar</h3>
-          <p className="text-2xl font-bold text-slate-800 mt-1">{formatCurrency(totalExpense)}</p>
-        </div>
-      </div>
-      
-      {/* Area Kosong untuk Grafik nanti */}
-      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center py-16">
-          <p className="text-slate-400">Area grafik statistik bulanan akan ditampilkan di sini.</p>
-      </div>
-    </div>
-  )
-}
+   )
+   }

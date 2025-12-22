@@ -9,7 +9,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Sistem Masjid Al-Ikhlas",
+  title: "Sistem Masjid Manarul Islam Bangil",
   description: "Sistem Informasi Keuangan dan Agenda Masjid",
 };
 
