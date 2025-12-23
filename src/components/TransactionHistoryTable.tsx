@@ -20,16 +20,12 @@ export function TransactionHistoryTable({ transactions }: { transactions: any[] 
                 <th className="py-3.5 px-4 min-w-[200px]">Keterangan</th>
                 <th className="py-3.5 px-4 w-20 text-center">Bukti</th>
                 <th className="py-3.5 px-6 text-right w-40 whitespace-nowrap">Jumlah</th>
-                <th className="py-3.5 px-4 w-10"></th> {/* Kolom Aksi */}
+                <th className="py-3.5 px-4 w-10"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm">
               {transactions?.map((trx) => (
-                <tr
-                  key={trx.id}
-                  onClick={() => setSelectedTransaction(trx)} // Event Klik Baris
-                  className="hover:bg-blue-50/60 transition-colors group cursor-pointer"
-                >
+                <tr key={trx.id} onClick={() => setSelectedTransaction(trx)} className="hover:bg-blue-50/60 transition-colors group cursor-pointer">
                   <td className="py-3.5 px-6 text-slate-600 font-medium whitespace-nowrap">{formatDate(trx.date)}</td>
                   <td className="py-3.5 px-4">
                     <span
@@ -43,8 +39,6 @@ export function TransactionHistoryTable({ transactions }: { transactions: any[] 
                   <td className="py-3.5 px-4 text-slate-600 truncate max-w-[150px] sm:max-w-[200px]" title={trx.description || ""}>
                     {trx.description || "-"}
                   </td>
-
-                  {/* Indikator Bukti */}
                   <td className="py-3.5 px-4 text-center">
                     {trx.image_path ? (
                       <div className="inline-flex items-center justify-center text-blue-500 bg-blue-50 p-1 rounded-md">
@@ -59,7 +53,6 @@ export function TransactionHistoryTable({ transactions }: { transactions: any[] 
                     {trx.type === "income" ? "+" : "-"} {formatCurrency(trx.amount)}
                   </td>
 
-                  {/* Icon Mata (Muncul saat Hover) */}
                   <td className="py-3.5 px-4 text-center text-slate-300 group-hover:text-blue-500 transition-colors">
                     <Eye size={18} />
                   </td>
