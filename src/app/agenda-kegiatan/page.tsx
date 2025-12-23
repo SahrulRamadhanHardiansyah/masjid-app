@@ -40,7 +40,7 @@ export default async function AgendaPage(props: {
             <ArrowLeft size={18} /> <span className="text-sm font-medium">Kembali ke Beranda</span>
           </Link>
           <div className="flex items-center gap-2 font-bold text-slate-800">
-             <Building2 size={18} className="text-blue-700"/> Agenda Masjid
+            Agenda Masjid
           </div>
         </div>
       </nav>

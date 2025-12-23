@@ -35,8 +35,8 @@ export default async function PublicPage() {
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
           <div className="flex items-center gap-2.5">
-            <div className="bg-blue-700 p-1.5 rounded text-white">
-                <Building2 size={18} />
+            <div className="rounded text-white">
+            <img src="https://manarulislambangil.masjidku.web.id/wp-content/uploads/2022/06/LOGO-1.png" alt="logo masjid" className="w-10 h-20 object-contain" />
             </div>
             <span className="font-bold text-lg text-slate-800 tracking-tight">Masjid Manarul Islam Bangil</span>
           </div>

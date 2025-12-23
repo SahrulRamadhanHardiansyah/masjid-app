@@ -11,7 +11,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 p-8 relative z-10 mx-4">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-50 text-blue-700 mb-4 border border-blue-100">
-            <Building2 size={28} />
+            <img src="https://manarulislambangil.masjidku.web.id/wp-content/uploads/2022/06/LOGO-1.png" alt="logo masjid" className="w-10 h-10 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Login Pengurus</h1>
           <p className="text-sm text-slate-500 mt-2 leading-relaxed">
