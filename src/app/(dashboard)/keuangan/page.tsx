@@ -9,59 +9,42 @@ export default async function KeuanganPage(props: { searchParams: Promise<{ page
   const searchParams = await props.searchParams;
   const supabase = await createClient();
 
-  // 1. Setup Pagination & Sorting Variables
   const page = Number(searchParams.page) || 1;
   const sort = searchParams.sort || "latest";
   const itemsPerPage = 10;
-
-  // Hitung Range untuk Supabase
   const from = (page - 1) * itemsPerPage;
   const to = from + itemsPerPage - 1;
 
   const { data: categories } = await supabase.from("transaction_categories").select("*");
 
-  // 2. Build Query Dinamis
   let query = supabase.from("transactions").select("*, transaction_categories(name)", { count: "exact" });
 
-  // Logic Sorting
   switch (sort) {
-    case "oldest":
-      query = query.order("date", { ascending: true });
-      break;
-    case "amount_desc":
-      query = query.order("amount", { ascending: false });
-      break;
-    case "amount_asc":
-      query = query.order("amount", { ascending: true });
-      break;
-    case "desc_asc":
-      query = query.order("description", { ascending: true });
-      break;
-    default: // latest
-      query = query.order("date", { ascending: false });
+    case "oldest": query = query.order("date", { ascending: true }); break;
+    case "amount_desc": query = query.order("amount", { ascending: false }); break;
+    case "amount_asc": query = query.order("amount", { ascending: true }); break;
+    case "desc_asc": query = query.order("description", { ascending: true }); break;
+    default: query = query.order("date", { ascending: false });
   }
 
-  // 3. Execute Query dengan Range
   const { data: transactions, count } = await query.range(from, to);
-
   const totalCount = count || 0;
   const hasNextPage = totalCount > to + 1;
   const hasPrevPage = page > 1;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Header Section */}
-      <div className="flex justify-between items-end">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-2">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Manajemen Keuangan</h1>
-          <p className="text-slate-500 mt-1">Catat pemasukan dan pengeluaran kas masjid secara rinci.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Manajemen Keuangan</h1>
+          <p className="text-sm text-slate-500 mt-1">Catat pemasukan dan pengeluaran kas masjid secara rinci.</p>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Kolom Kiri: Form Input */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm sticky top-24 overflow-hidden">
+      <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+        {/* Kolom Kiri: Form Input (Tambahkan min-w-0) */}
+        <div className="lg:col-span-1 min-w-0">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm lg:sticky lg:top-24 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
               <div className="bg-emerald-100 p-1.5 rounded-md text-emerald-700">
                 <PlusCircle size={18} />
@@ -74,7 +57,7 @@ export default async function KeuanganPage(props: { searchParams: Promise<{ page
                 "use server";
                 await createTransaction(formData);
               }}
-              className="p-6 space-y-5"
+              className="p-4 md:p-6 space-y-4 md:space-y-5"
             >
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Tanggal Transaksi</label>
@@ -147,8 +130,8 @@ export default async function KeuanganPage(props: { searchParams: Promise<{ page
           </div>
         </div>
 
-        {/* Kolom Kanan: Tabel Data */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Kolom Kanan: Tabel Data (Tambahkan min-w-0) */}
+        <div className="lg:col-span-2 space-y-4 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-slate-800">Riwayat Keuangan</h2>
@@ -164,14 +147,14 @@ export default async function KeuanganPage(props: { searchParams: Promise<{ page
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm min-h-[400px]">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto w-full"> {/* Pastikan w-full ada di sini */}
               <table className="w-full text-left">
                 <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                   <tr>
-                    <th className="py-3.5 px-6 w-32">Tanggal</th>
-                    <th className="py-3.5 px-4 w-40">Kategori</th>
-                    <th className="py-3.5 px-4">Keterangan</th>
-                    <th className="py-3.5 px-6 text-right w-40">Jumlah</th>
+                    <th className="py-3.5 px-6 w-32 whitespace-nowrap">Tanggal</th>
+                    <th className="py-3.5 px-4 w-40 whitespace-nowrap">Kategori</th>
+                    <th className="py-3.5 px-4 min-w-[200px]">Keterangan</th>
+                    <th className="py-3.5 px-6 text-right w-40 whitespace-nowrap">Jumlah</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -180,17 +163,17 @@ export default async function KeuanganPage(props: { searchParams: Promise<{ page
                       <td className="py-3.5 px-6 text-slate-600 font-medium whitespace-nowrap">{formatDate(trx.date)}</td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border whitespace-nowrap ${
                             trx.type === "income" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-rose-50 text-rose-700 border-rose-100"
                           }`}
                         >
                           {trx.transaction_categories?.name}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 truncate max-w-[200px]" title={trx.description || ""}>
+                      <td className="py-3.5 px-4 text-slate-600 truncate max-w-[150px] sm:max-w-[200px]" title={trx.description || ""}>
                         {trx.description || "-"}
                       </td>
-                      <td className={`py-3.5 px-6 text-right font-mono font-semibold ${trx.type === "income" ? "text-emerald-600" : "text-rose-600"}`}>
+                      <td className={`py-3.5 px-6 text-right font-mono font-semibold whitespace-nowrap ${trx.type === "income" ? "text-emerald-600" : "text-rose-600"}`}>
                         {trx.type === "income" ? "+" : "-"} {formatCurrency(trx.amount)}
                       </td>
                     </tr>
@@ -202,7 +185,6 @@ export default async function KeuanganPage(props: { searchParams: Promise<{ page
                           <Search size={24} className="text-slate-300" />
                         </div>
                         <p className="text-slate-500 font-medium">Belum ada data transaksi.</p>
-                        <p className="text-slate-400 text-xs mt-1">Coba ubah filter atau tambah data baru.</p>
                       </td>
                     </tr>
                   )}
