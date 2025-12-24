@@ -1,46 +1,53 @@
-'use client'
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation'
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { useCallback } from "react";
 
 export function MonthFilter() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const currentMonth = Number(searchParams.get('month')) || new Date().getMonth() + 1
-  const currentYear = Number(searchParams.get('year')) || new Date().getFullYear()
+  const now = new Date();
+  const month = Number(searchParams.get("month")) || now.getMonth() + 1;
+  const year = Number(searchParams.get("year")) || now.getFullYear();
 
-  const date = new Date(currentYear, currentMonth - 1, 1)
-  const monthName = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+  const handleNav = useCallback(
+    (direction: number) => {
+      const date = new Date(year, month - 1 + direction, 1);
+      const newMonth = date.getMonth() + 1;
+      const newYear = date.getFullYear();
 
-  const changeDate = (increment: number) => {
-    const newDate = new Date(currentYear, currentMonth - 1 + increment, 1)
-    const newMonth = newDate.getMonth() + 1
-    const newYear = newDate.getFullYear()
-    
-    router.push(`/laporan?month=${newMonth}&year=${newYear}`)
-  }
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("month", newMonth.toString());
+      params.set("year", newYear.toString());
+
+      router.push(`?${params.toString()}`);
+    },
+    [month, year, router, searchParams]
+  );
+
+  const label = new Date(year, month - 1, 1).toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
-    <div className="flex items-center gap-4 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-      <button 
-        onClick={() => changeDate(-1)}
-        className="p-2 hover:bg-slate-100 rounded-md text-slate-500 hover:text-blue-700 transition-colors"
-      >
-        <ChevronLeft size={20} />
+    // PERUBAHAN DI SINI: Hapus min-w-[220px], ganti jadi min-w-0 agar fleksibel di grid
+    <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg shadow-sm h-10 w-full sm:w-auto min-w-0 px-1">
+      <button onClick={() => handleNav(-1)} className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors">
+        <ChevronLeft size={18} />
       </button>
-      
-      <div className="flex items-center gap-2 min-w-[180px] justify-center text-slate-700 font-semibold select-none">
-        <Calendar size={18} className="text-blue-600 mb-0.5" />
-        <span>{monthName}</span>
+
+      <div className="flex items-center justify-center gap-1.5 flex-1 h-full px-1 overflow-hidden">
+        <Calendar size={14} className="text-blue-600 flex-shrink-0" />
+        {/* Tambahkan truncate agar teks tidak merusak layout jika layar sangat kecil */}
+        <span className="text-xs sm:text-sm font-semibold text-slate-700 truncate">{label}</span>
       </div>
 
-      <button 
-        onClick={() => changeDate(1)}
-        className="p-2 hover:bg-slate-100 rounded-md text-slate-500 hover:text-blue-700 transition-colors"
-      >
-        <ChevronRight size={20} />
+      <button onClick={() => handleNav(1)} className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors">
+        <ChevronRight size={18} />
       </button>
     </div>
-  )
+  );
 }

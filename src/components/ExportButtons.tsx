@@ -32,7 +32,6 @@ export function ExportButton() {
   const handleExportExcel = async () => {
     try {
       setLoadingExcel(true);
-      // Kirim parameter tanggal ke server
       const data = await getAllTransactionsForExport(startDate, endDate);
 
       if (!data || data.length === 0) {
@@ -41,15 +40,12 @@ export function ExportButton() {
       }
 
       const { totalIncome, totalExpense, balance } = calculateTotals(data);
-
-      // Hapus properti RawDate sebelum masuk Excel agar bersih
       const cleanData = data.map(({ RawDate, ...rest }) => rest);
 
       const worksheet = XLSX.utils.json_to_sheet(cleanData);
       const wscols = [{ wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 20 }];
       worksheet["!cols"] = wscols;
 
-      // Tambahkan Info Periode di Excel
       const periodeText = startDate && endDate ? `Periode: ${startDate} s/d ${endDate}` : `Semua Periode (per ${new Date().toLocaleDateString("id-ID")})`;
 
       XLSX.utils.sheet_add_aoa(
@@ -86,14 +82,12 @@ export function ExportButton() {
       const { totalIncome, totalExpense, balance } = calculateTotals(data);
       const doc = new jsPDF();
 
-      // HEADER
       doc.setFontSize(18);
       doc.text("MASJID MANARUL ISLAM BANGIL", 105, 20, { align: "center" });
       doc.setFontSize(12);
       doc.text("Laporan Keuangan Kas Masjid", 105, 30, { align: "center" });
 
       doc.setFontSize(10);
-      // Teks Periode Dinamis
       let periodeText = `Per Tanggal: ${new Date().toLocaleDateString("id-ID", { dateStyle: "full" })}`;
       if (startDate && endDate) {
         const startStr = new Date(startDate).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
@@ -105,7 +99,6 @@ export function ExportButton() {
       doc.setLineWidth(0.5);
       doc.line(15, 42, 195, 42);
 
-      // TABLE
       const tableBody = data.map((row) => [row.Tanggal, row.Kategori, row.Tipe === "Pemasukan" ? "(+)" : "(-)", row.Keterangan, formatCurrency(row.Nominal)]);
 
       autoTable(doc, {
@@ -124,7 +117,6 @@ export function ExportButton() {
         },
       });
 
-      // SUMMARY & FOOTER
       let finalY = (doc as any).lastAutoTable.finalY + 10;
       if (finalY > 240) {
         doc.addPage();
@@ -144,7 +136,6 @@ export function ExportButton() {
       doc.text("SALDO PERIODE:", summaryX, finalY + 14);
       doc.text(formatCurrency(balance), 195, finalY + 14, { align: "right" });
 
-      // Tanda Tangan
       const signY = finalY + 40 > 270 ? 40 : finalY + 40;
       if (signY === 40) doc.addPage();
 
@@ -164,13 +155,13 @@ export function ExportButton() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative h-10 w-full sm:w-auto">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm active:scale-[0.98]"
+        className="w-full h-full bg-white border border-slate-300 text-slate-700 px-4 rounded-lg hover:bg-slate-50 flex items-center justify-center gap-2 font-medium shadow-sm transition-all text-sm"
       >
         <Download size={16} />
-        <span className="hidden sm:inline">Export & Filter</span>
+        <span>Export</span>
         <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
@@ -178,14 +169,13 @@ export function ExportButton() {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
 
-          {/* Dropdown Menu - Lebar disesuaikan untuk form */}
-          <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-100 z-20 animate-in fade-in zoom-in-95 duration-100 overflow-hidden">
-            {/* Header Dropdown */}
+          {/* PERBAIKAN FINAL POSISI MODAL */}
+          {/* Mobile: left-0 (Menempel Kiri), Desktop: right-0 (Menempel Kanan) */}
+          <div className="absolute left-0 sm:left-auto sm:right-0 mt-1 w-72 bg-white rounded-xl shadow-xl border border-slate-100 z-20 animate-in fade-in zoom-in-95 duration-200 overflow-hidden origin-top-left sm:origin-top-right">
             <div className="bg-slate-50 px-4 py-3 border-b border-slate-100">
               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Filter Periode</h3>
             </div>
 
-            {/* Input Tanggal */}
             <div className="p-4 space-y-3">
               <div>
                 <label className="text-xs text-slate-500 font-medium mb-1 block">Dari Tanggal</label>
@@ -196,7 +186,6 @@ export function ExportButton() {
                 <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-xs border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-500" />
               </div>
 
-              {/* Tombol Reset Filter */}
               {(startDate || endDate) && (
                 <button
                   onClick={() => {
@@ -210,7 +199,6 @@ export function ExportButton() {
               )}
             </div>
 
-            {/* Action Buttons */}
             <div className="p-2 bg-slate-50 border-t border-slate-100 grid grid-cols-2 gap-2">
               <button
                 onClick={handleExportExcel}

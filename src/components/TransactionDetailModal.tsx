@@ -92,7 +92,13 @@ export function TransactionDetailModal({ transaction, onClose }: TransactionDeta
             </div>
             {transaction.image_path ? (
               <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative group">
-                <img src={getStorageUrl(transaction.image_path) || ""} alt="Bukti Nota" className="w-full h-auto object-contain max-h-[300px] bg-slate-50" />
+                {getStorageUrl(transaction.image_path) ? (
+                  <img src={getStorageUrl(transaction.image_path)!} alt="Bukti Nota" className="w-full h-auto object-contain max-h-[300px] bg-slate-50" />
+                ) : (
+                  <div className="flex items-center justify-center h-32 bg-slate-100 text-slate-400">
+                    <p className="text-xs">Gambar tidak dapat dimuat</p>
+                  </div>
+                )}
                 <a
                   href={getStorageUrl(transaction.image_path) || "#"}
                   target="_blank"
