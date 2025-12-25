@@ -59,6 +59,12 @@ export default function LoginPage() {
             </div>
           </div>
 
+          <div className="flex justify-end mb-4">
+            <Link href="/forgot-password" className="text-xs text-blue-600 hover:underline">
+              Lupa Password?
+            </Link>
+          </div>
+
           <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-all transform active:scale-[0.98] shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 mt-2">
             Masuk Dashboard
           </button>

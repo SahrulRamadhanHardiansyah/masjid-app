@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAgenda } from "./actions";
-import { MapPin, User, Clock, PlusCircle, AlertCircle } from "lucide-react";
+import { MapPin, User, Clock, PlusCircle, AlertCircle, ImageIcon } from "lucide-react";
 import { DeleteAgendaButton } from "@/components/DeleteAgendaButton";
 import { EditAgendaButton } from "@/components/EditAgendaButton";
 
@@ -66,7 +66,21 @@ export default async function AgendaPage() {
                   <input name="pic_name" required placeholder="Nama Ustadz / Panitia" className="w-full text-sm border border-slate-300 rounded-lg pl-9 pr-3 py-2.5 text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                 </div>
               </div>
-
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Poster / Foto (Opsional)</label>
+                <div className="relative group">
+                  <div className="absolute left-3 top-3 text-slate-400 group-hover:text-blue-600 transition-colors">
+                    <ImageIcon size={16} />
+                  </div>
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    className="w-full text-sm border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-slate-700 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                  />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1">*Max 2MB. Format: JPG, PNG.</p>
+              </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Deskripsi Singkat</label>
                 <textarea
@@ -97,7 +111,6 @@ export default async function AgendaPage() {
               const isPast = new Date() > startDate;
 
               return (
-                // PERBAIKAN: Tambahkan w-full dan max-w-full pada container card
                 <div key={item.id} className={`group bg-white p-4 md:p-5 rounded-xl border transition-all hover:shadow-md w-full max-w-full overflow-hidden ${isPast ? "border-slate-100 opacity-60" : "border-slate-200"}`}>
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4 w-full">
                     {/* Bagian Konten Kiri (Tanggal & Detail) */}

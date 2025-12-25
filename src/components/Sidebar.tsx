@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/lib/actions/auth";
-import { LayoutDashboard, Wallet, Calendar, LogOut, UserCircle } from "lucide-react";
+import { LayoutDashboard, Wallet, Calendar, LogOut, UserCircle, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const MENUS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/keuangan", label: "Keuangan", icon: Wallet },
   { href: "/agenda", label: "Agenda", icon: Calendar },
+  { href: "/pengguna", label: "Pengguna", icon: Users },
 ];
 
 export function Sidebar({ user }: { user: any }) {

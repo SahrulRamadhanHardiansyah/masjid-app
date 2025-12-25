@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Pencil, X, Save, Loader2 } from "lucide-react";
+import { Pencil, X, Save, Loader2, Image as ImageIcon } from "lucide-react";
 import { updateAgenda } from "@/app/(dashboard)/agenda/actions";
 
 interface EditProps {
@@ -13,6 +13,7 @@ interface EditProps {
     location: string;
     pic_name: string;
     short_description: string;
+    image_path?: string | null; // Tambahkan tipe untuk image
   };
 }
 
@@ -93,6 +94,26 @@ export function EditAgendaButton({ agenda }: EditProps) {
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">PIC</label>
                     <input name="pic_name" defaultValue={agenda.pic_name} required className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-slate-700" />
                   </div>
+                </div>
+
+                {/* INPUT FILE UNTUK EDIT */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                    Ganti Poster / Foto
+                    <span className="text-slate-400 font-normal normal-case ml-1">(Kosongkan jika tidak ingin mengubah)</span>
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-3 top-3 text-slate-400 group-hover:text-blue-600 transition-colors">
+                      <ImageIcon size={16} />
+                    </div>
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/*"
+                      className="w-full text-sm border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-slate-700 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    />
+                  </div>
+                  {agenda.image_path && <p className="text-[10px] text-emerald-600 mt-1 flex items-center gap-1">✓ Saat ini sudah ada gambar tersimpan.</p>}
                 </div>
 
                 <div>
