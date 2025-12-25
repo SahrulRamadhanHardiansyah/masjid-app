@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { UserPlus, X, Loader2 } from "lucide-react";
 import { createNewUser } from "@/lib/actions/users";
+import { toast } from "sonner";
 
 export function AddUserModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,9 +15,13 @@ export function AddUserModal() {
     try {
       await createNewUser(formData);
       setIsOpen(false);
-      alert("User berhasil dibuat! Silakan minta user cek email untuk verifikasi.");
+      toast.success("Pengguna berhasil ditambahkan", {
+        description: "Email verifikasi telah dikirim ke alamat tersebut.",
+      });
     } catch (error: any) {
-      alert("Gagal membuat user: " + error.message);
+      toast.error("Gagal membuat pengguna", {
+        description: error.message,
+      });
     } finally {
       setIsLoading(false);
     }
