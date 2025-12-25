@@ -39,7 +39,7 @@ export async function createNewUser(formData: FormData) {
       type: "signup",
       email: email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
       },
     });
 
