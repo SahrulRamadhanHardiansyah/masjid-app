@@ -1,62 +1,47 @@
 "use client";
 
 import { useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
 
 function AuthCallbackContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
 
   useEffect(() => {
     const handleAuth = async () => {
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get("access_token");
-      const refreshToken = hashParams.get("refresh_token");
+      if (window.location.hash) {
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
 
-      if (accessToken && refreshToken) {
-        const { error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
 
-        if (error) {
-          console.error("Set Session Error:", error);
-          router.replace("/login?error=auth-failed");
-          return;
+          if (!error) {
+            router.replace("/dashboard");
+            return;
+          }
         }
       }
 
       const {
         data: { session },
-        error,
       } = await supabase.auth.getSession();
 
       if (session) {
-        const nextUrl = searchParams.get("next") || "/dashboard";
-        router.replace(nextUrl);
-        router.refresh();
-      } else if (error) {
-        console.error("Auth Error:", error);
-        router.replace("/login?error=auth-failed");
+        router.replace("/dashboard");
       } else {
-        const {
-          data: { subscription },
-        } = supabase.auth.onAuthStateChange((event, session) => {
-          if (event === "SIGNED_IN" && session) {
-            const nextUrl = searchParams.get("next") || "/dashboard";
-            router.replace(nextUrl);
-            router.refresh();
-          }
-        });
-        return () => subscription.unsubscribe();
+        router.replace("/login?error=no-session");
       }
     };
 
     handleAuth();
-  }, [router, supabase, searchParams]);
+  }, [router, supabase]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-slate-50">
