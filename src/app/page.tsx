@@ -31,18 +31,23 @@ export default async function PublicPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-poppins selection:bg-blue-200">
       
-      {/* Navbar Professional */}
+{/* Navbar Professional */}
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
-          <div className="flex items-center gap-2.5">
-            <div className="rounded text-white">
-            <img src="https://manarulislambangil.masjidku.web.id/wp-content/uploads/2022/06/LOGO-1.png" alt="logo masjid" className="w-10 h-20 object-contain" />
-            </div>
-            <span className="font-bold text-lg text-slate-800 tracking-tight">Masjid Manarul Islam Bangil</span>
+          <div className="flex items-center gap-3">
+            <img 
+              src="https://manarulislambangil.masjidku.web.id/wp-content/uploads/2022/06/LOGO-1.png" 
+              alt="logo masjid" 
+              className="h-10 w-auto object-contain" 
+            />
+            <span className="font-bold text-lg text-slate-800 tracking-tight leading-tight">
+              Masjid Manarul Islam Bangil
+            </span>
           </div>
           <Link href="/login" className="flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-blue-700 transition-colors px-3 py-2 rounded-md hover:bg-blue-50">
             <Lock size={14} /> AREA PENGURUS
           </Link>
+          
         </div>
       </nav>
 
