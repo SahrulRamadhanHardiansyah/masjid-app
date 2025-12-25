@@ -12,6 +12,23 @@ function AuthCallbackContent() {
 
   useEffect(() => {
     const handleAuth = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (error) {
+          console.error("Set Session Error:", error);
+          router.replace("/login?error=auth-failed");
+          return;
+        }
+      }
+
       const {
         data: { session },
         error,
@@ -19,7 +36,6 @@ function AuthCallbackContent() {
 
       if (session) {
         const nextUrl = searchParams.get("next") || "/dashboard";
-
         router.replace(nextUrl);
         router.refresh();
       } else if (error) {
