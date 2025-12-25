@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client"; // Pastikan ini mengarah ke client component supabase Anda
+import { useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   useEffect(() => {
@@ -17,7 +18,9 @@ export default function AuthCallbackPage() {
       } = await supabase.auth.getSession();
 
       if (session) {
-        router.replace("/dashboard");
+        const nextUrl = searchParams.get("next") || "/dashboard";
+
+        router.replace(nextUrl);
         router.refresh();
       } else if (error) {
         console.error("Auth Error:", error);
@@ -27,7 +30,8 @@ export default function AuthCallbackPage() {
           data: { subscription },
         } = supabase.auth.onAuthStateChange((event, session) => {
           if (event === "SIGNED_IN" && session) {
-            router.replace("/dashboard");
+            const nextUrl = searchParams.get("next") || "/dashboard";
+            router.replace(nextUrl);
             router.refresh();
           }
         });
@@ -36,7 +40,7 @@ export default function AuthCallbackPage() {
     };
 
     handleAuth();
-  }, [router, supabase]);
+  }, [router, supabase, searchParams]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-slate-50">
@@ -46,9 +50,17 @@ export default function AuthCallbackPage() {
         </div>
         <div className="text-center">
           <h3 className="font-bold text-slate-800 text-lg">Memproses Verifikasi...</h3>
-          <p className="text-sm text-slate-500">Mohon tunggu sebentar, Anda akan diarahkan otomatis.</p>
+          <p className="text-sm text-slate-500">Mohon tunggu, Anda sedang diarahkan.</p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="h-screen bg-slate-50" />}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

@@ -1,30 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updatePassword } from "@/lib/actions/users";
 import { useRouter } from "next/navigation";
 import { Lock, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 export default function UpdatePasswordPage() {
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace("/login");
+      } else {
+        setCheckingAuth(false);
+      }
+    };
+    checkSession();
+  }, [router, supabase]);
 
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
     try {
       await updatePassword(formData);
-      alert("Password berhasil diubah! Silakan login.");
-      router.push("/login");
+      toast.success("Password berhasil diubah! Silakan login.");
+
+      await supabase.auth.signOut();
+      router.replace("/login");
     } catch (error) {
-      alert("Gagal mengubah password.");
+      toast.error("Gagal mengubah password.");
     } finally {
       setLoading(false);
     }
   };
 
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-slate-100">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-slate-100 animate-in fade-in zoom-in-95">
         <h1 className="text-2xl font-bold text-slate-800 mb-2">Buat Password Baru</h1>
         <p className="text-sm text-slate-500 mb-6">Masukkan password baru untuk akun Anda.</p>
 
