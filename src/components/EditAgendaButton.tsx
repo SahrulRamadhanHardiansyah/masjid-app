@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Pencil, X, Save, Loader2, Image as ImageIcon } from "lucide-react";
 import { updateAgenda } from "@/app/(dashboard)/agenda/actions";
+import { toast } from "sonner";
 
 interface EditProps {
   agenda: {
@@ -37,8 +38,9 @@ export function EditAgendaButton({ agenda }: EditProps) {
     try {
       await updateAgenda(agenda.id, formData);
       setIsOpen(false);
+      toast.success("Agenda berhasil diperbarui");
     } catch (error) {
-      alert("Gagal update data");
+      toast.error("Gagal mengupdate agenda"); 
     } finally {
       setIsLoading(false);
     }

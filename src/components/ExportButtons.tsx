@@ -7,6 +7,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getAllTransactionsForExport } from "@/lib/actions/finance";
 import { formatCurrency } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function ExportButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,7 @@ export function ExportButton() {
       const data = await getAllTransactionsForExport(startDate, endDate);
 
       if (!data || data.length === 0) {
-        alert("Tidak ada data pada periode tersebut.");
+        toast.info("Tidak ada data pada periode tersebut.");
         return;
       }
 
@@ -60,9 +61,10 @@ export function ExportButton() {
       const fileName = `Laporan_${startDate || "All"}_${endDate || "Time"}.xlsx`;
       XLSX.writeFile(workbook, fileName);
       setIsOpen(false);
+      toast.success("Laporan Excel berhasil diunduh");
     } catch (error) {
       console.error("Error Excel:", error);
-      alert("Gagal export Excel");
+      toast.error("Gagal export Excel");
     } finally {
       setLoadingExcel(false);
     }
@@ -75,7 +77,7 @@ export function ExportButton() {
       const data = await getAllTransactionsForExport(startDate, endDate);
 
       if (!data || data.length === 0) {
-        alert("Tidak ada data pada periode tersebut.");
+        toast.info("Tidak ada data pada periode tersebut.");
         return;
       }
 
@@ -146,9 +148,10 @@ export function ExportButton() {
 
       doc.save(`Laporan_${startDate || "All"}_${endDate || "Time"}.pdf`);
       setIsOpen(false);
+      toast.success("Laporan PDF berhasil diunduh");
     } catch (error) {
       console.error("Error PDF:", error);
-      alert("Gagal export PDF");
+      toast.error("Gagal export PDF");
     } finally {
       setLoadingPdf(false);
     }

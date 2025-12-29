@@ -4,6 +4,14 @@ import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
+const getAppUrl = () => {
+  let url = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  if (url.endsWith("/")) {
+    url = url.slice(0, -1);
+  }
+  return url;
+};
+
 const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
   auth: {
     autoRefreshToken: false,
@@ -39,7 +47,7 @@ export async function createNewUser(formData: FormData) {
       type: "signup",
       email: email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+        emailRedirectTo: `${getAppUrl()}/auth/callback`,
       },
     });
 
@@ -82,7 +90,7 @@ export async function requestPasswordReset(formData: FormData) {
   const email = formData.get("email") as string;
   const supabase = await createServerClient();
 
-  const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/update-password`;
+  const redirectUrl = `${getAppUrl()}/auth/callback?next=/update-password`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: redirectUrl,

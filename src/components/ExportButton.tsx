@@ -16,11 +16,9 @@ interface ExportButtonProps {
 export function ExportButton({ transactions, month, year }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Judul Laporan
   const monthName = new Date(year, month - 1, 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
   const fileName = `Laporan_Kas_Masjid_${monthName.replace(/\s/g, "_")}`;
 
-  // --- LOGIC PDF ---
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
 
@@ -108,8 +106,6 @@ export function ExportButton({ transactions, month, year }: ExportButtonProps) {
 
   return (
     <div className="relative h-10 w-full sm:w-auto">
-      {" "}
-      {/* Pastikan h-10 agar sama dengan filter */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full h-full bg-white border border-slate-300 text-slate-700 px-4 rounded-lg hover:bg-slate-50 flex items-center justify-center gap-2 font-medium shadow-sm transition-all text-sm"
