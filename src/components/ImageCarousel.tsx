@@ -8,9 +8,9 @@ export function ImageCarousel() {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 3000 })])
 
   const images = [
-    'https://s6.imgcdn.dev/YUfxpi.jpg',
-    'https://s6.imgcdn.dev/YUfAsH.png',
-    'https://s6.imgcdn.dev/YUfO2S.jpg',
+      '/carousel/zakat.png',
+      '/carousel/zakat2.png',
+      '/carousel/zakat3.png',
   ]
 
   return (
