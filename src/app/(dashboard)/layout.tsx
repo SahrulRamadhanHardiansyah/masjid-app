@@ -24,7 +24,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             {/* Tombol Menu Mobile (Visible only on Mobile) */}
             <MobileSidebar user={user} />
 
-            <h1 className="text-sm font-medium text-slate-500 truncate max-w-[200px] md:max-w-none">
+            <h1 className="text-sm font-medium text-slate-500 truncate max-w-200px md:max-w-none">
               <span className="hidden md:inline">Sistem Informasi </span>Masjid Manarul Islam<span className="hidden md:inline"> Bangil</span>
             </h1>
           </div>

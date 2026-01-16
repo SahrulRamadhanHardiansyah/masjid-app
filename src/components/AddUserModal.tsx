@@ -35,7 +35,7 @@ export function AddUserModal() {
 
       {isOpen &&
         createPortal(
-          <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-999 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
             <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95">
               <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
