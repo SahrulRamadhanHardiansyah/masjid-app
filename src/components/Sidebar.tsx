@@ -32,7 +32,7 @@ export function Sidebar({ user }: { user: any }) {
 
       {/* Menu Navigasi */}
       <div className="p-4 flex-1 overflow-y-auto">
-        <p className="text-xs font-semibold text-blue-300 uppercase tracking-wider mb-3 px-2">Main Menu</p>
+        <p className="text-xs font-semibold text-blue-300 uppercase tracking-wider mb-3 px-2">Menu</p>
         <nav className="space-y-1.5">
           {MENUS.map((menu) => {
             const isActive = pathname.startsWith(menu.href);

@@ -13,7 +13,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-poppins">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden">
         {/* Dekorasi Background */}
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-500 to-orange-500"></div>
+        <div className="absolute top-0 left-0 w-full h-1.5 .bg-gradient-to-r from-red-500 to-orange-500"></div>
 
         {/* Icon */}
         <div className="inline-flex items-center justify-center w-16 h-16 bg-red-50 text-red-600 rounded-full mb-6">
