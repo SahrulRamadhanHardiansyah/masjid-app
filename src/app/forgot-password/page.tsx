@@ -6,30 +6,35 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function submit() {
-    if (!email) {
-      alert('Email wajib diisi')
+async function submit() {
+  if (!email) {
+    alert('Email wajib diisi')
+    return
+  }
+
+  setLoading(true)
+
+  try {
+    const res = await fetch('/api/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      alert(data.message || 'Gagal mengirim OTP')
       return
     }
 
-    setLoading(true)
-
-    try {
-      await fetch('/api/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      alert('OTP berhasil dikirim ke email')
-    } catch (error) {
-      alert('Gagal mengirim OTP')
-    } finally {
-      setLoading(false)
-    }
+    alert('OTP berhasil dikirim ke email')
+  } catch (error) {
+    alert('Server error')
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
