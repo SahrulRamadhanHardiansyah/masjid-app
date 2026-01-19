@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { SocketListener } from "@/components/SocketListener";
 import NextTopLoader from "nextjs-toploader";
 
 const poppins = Poppins({
@@ -21,21 +22,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
-      <body>
-        {/* Tambahkan komponen ini di sini */}
+ <html lang="id">
+      <body className={poppins.className}>
         <NextTopLoader
-          color="#2563EB" // Warna biru sesuai tema (blue-600)
+          color="#10B981"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
           crawl={true}
-          showSpinner={false} // Spinner dimatikan agar lebih bersih
+          showSpinner={false}
           easing="ease"
           speed={200}
-          shadow="0 0 10px #2563EB,0 0 5px #2563EB"
+          shadow="0 0 10px #10B981,0 0 5px #10B981"
         />
+        <SocketListener />
         {children}
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

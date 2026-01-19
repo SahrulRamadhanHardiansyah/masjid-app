@@ -64,6 +64,20 @@ export async function createAgenda(formData: FormData) {
     throw new Error("Gagal menyimpan agenda");
   }
 
+  // Broadcast Realtime Event
+  try {
+    await fetch("http://localhost:3001/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "agenda-update",
+        data: { message: `Agenda baru "${eventData.title}" telah ditambahkan` },
+      }),
+    });
+  } catch (e) {
+    console.error("Socket Error", e);
+  }
+
   revalidatePath("/agenda");
   revalidatePath("/agenda-kegiatan");
   revalidatePath("/");
@@ -134,6 +148,20 @@ export async function updateAgenda(id: string, formData: FormData) {
     throw new Error("Gagal mengupdate agenda");
   }
 
+  // Broadcast Realtime Event
+  try {
+    await fetch("http://localhost:3001/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "agenda-update",
+        data: { message: `Agenda "${eventData.title}" telah diperbarui` },
+      }),
+    });
+  } catch (e) {
+    console.error("Socket Error", e);
+  }
+
   revalidatePath("/agenda");
   revalidatePath("/agenda-kegiatan");
   revalidatePath("/");
@@ -142,6 +170,20 @@ export async function updateAgenda(id: string, formData: FormData) {
 export async function deleteAgenda(id: string) {
   const supabase = await createClient();
   await supabase.from("events").delete().eq("id", id);
+
+  // Broadcast Realtime Event
+  try {
+    await fetch("http://localhost:3001/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "agenda-update",
+        data: { message: `Sebuah agenda telah dihapus` },
+      }),
+    });
+  } catch (e) {
+    console.error("Socket Error", e);
+  }
 
   revalidatePath("/agenda");
   revalidatePath("/agenda-kegiatan");

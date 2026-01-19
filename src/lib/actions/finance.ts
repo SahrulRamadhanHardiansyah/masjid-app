@@ -73,6 +73,25 @@ export async function createTransaction(formData: FormData) {
     console.error("Transaction Error:", error);
   }
 
+  // Broadcast Realtime Event
+  try {
+    const isIncome = type === "income";
+    const label = isIncome ? "Pemasukan" : "Pengeluaran";
+    await fetch("http://localhost:3001/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "finance-update",
+        data: { 
+          message: `Laporan ${label} baru sebesar Rp ${Number(amount).toLocaleString("id-ID")}`,
+          type: type 
+        },
+      }),
+    });
+  } catch (e) {
+    console.error("Socket Error", e);
+  }
+
   revalidatePath("/keuangan");
   redirect("/keuangan");
 }
