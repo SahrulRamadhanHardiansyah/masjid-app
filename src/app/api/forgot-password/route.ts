@@ -34,13 +34,20 @@ export async function POST(req: Request) {
     const resetUrl =
       `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?email=${encodeURIComponent(email)}`
 
-    // ✉️ KIRIM EMAIL CUSTOM (INI KUNCINYA)
-    await transporter.sendMail({
-      from: `"Masjid App" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: 'Reset Password - Kode OTP',
-      html: resetPasswordEmail(otp, resetUrl),
-    })
+try {
+  await transporter.sendMail({
+    from: `"Masjid App" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Reset Password - Kode OTP',
+    html: resetPasswordEmail(otp, resetUrl),
+  })
+} catch (mailError) {
+  console.error('EMAIL ERROR:', mailError)
+  return NextResponse.json(
+    { message: 'Gagal mengirim email' },
+    { status: 500 }
+  )
+}
 
     return NextResponse.json({ message: 'OTP berhasil dikirim ke email' })
   } catch (err) {
